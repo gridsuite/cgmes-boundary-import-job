@@ -1,0 +1,8 @@
+acquisition-server:
+  url: sftp://localhost:2222
+  username: dummy
+  password: dummy
+  cgmes-boundary-directory: ./boundaries
+
+cgmes-boundary-server:
+  url: http://localhost:45385/
