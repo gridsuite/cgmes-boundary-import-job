@@ -9,7 +9,6 @@ package org.gridsuite.boundary.importer.job;
 import com.powsybl.cgmes.model.FullModel;
 import com.powsybl.commons.config.ModuleConfig;
 import com.powsybl.commons.config.PlatformConfig;
-import com.powsybl.commons.exceptions.UncheckedInterruptedException;
 import org.apache.commons.io.FilenameUtils;
 import org.gridsuite.boundary.importer.job.utils.CgmesBoundaryUtils;
 import org.gridsuite.boundary.importer.job.utils.SecuredZipInputStream;
@@ -43,7 +42,7 @@ public final class BoundaryAcquisitionJob {
                                        CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                        List<String> filesImported,
                                        List<String> filesAlreadyImported,
-                                       List<String> filesImportFailed) {
+                                       List<String> filesImportFailed) throws InterruptedException {
         try (Reader reader = new InputStreamReader(new ByteArrayInputStream(boundaryContent))) {
             // parse full model to get the id
             FullModel fullModel = FullModel.parse(reader);
@@ -65,7 +64,7 @@ public final class BoundaryAcquisitionJob {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (InterruptedException e) {
-            throw new UncheckedInterruptedException(e);
+            throw e;
         }
     }
 
@@ -74,7 +73,7 @@ public final class BoundaryAcquisitionJob {
                                                    CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                                    List<String> filesImported,
                                                    List<String> filesAlreadyImported,
-                                                   List<String> filesImportFailed) {
+                                                   List<String> filesImportFailed) throws InterruptedException {
         String fileName;
         try (SecuredZipInputStream zis = new SecuredZipInputStream(new ByteArrayInputStream(acquiredFile.getData()), CgmesBoundaryUtils.MAX_ZIP_ENTRIES_COUNT, CgmesBoundaryUtils.MAX_ZIP_SIZE)) {
             ZipEntry entry = zis.getNextEntry();
@@ -100,6 +99,8 @@ public final class BoundaryAcquisitionJob {
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (InterruptedException e) {
+            throw e;
         }
     }
 

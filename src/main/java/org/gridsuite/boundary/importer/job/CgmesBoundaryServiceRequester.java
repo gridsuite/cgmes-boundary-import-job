@@ -17,8 +17,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 
@@ -59,7 +57,7 @@ public class CgmesBoundaryServiceRequester {
     }
 
     private HttpRequest.BodyPublisher ofMimeMultipartData(Map<Object, Object> data,
-                                                         String boundary) throws IOException {
+                                                         String boundary) {
         // Result request body
         List<byte[]> byteArrays = new ArrayList<>();
 
@@ -79,13 +77,6 @@ public class CgmesBoundaryServiceRequester {
                 byteArrays.add(("\"" + entry.getKey() + "\"; filename=\"" + file.getName()
                         + "\"\r\nContent-Type: " + mimeType + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
                 byteArrays.add(file.getData());
-                byteArrays.add("\r\n".getBytes(StandardCharsets.UTF_8));
-            } else if (entry.getValue() instanceof Path) {
-                var path = (Path) entry.getValue();
-                String mimeType = Files.probeContentType(path);
-                byteArrays.add(("\"" + entry.getKey() + "\"; filename=\"" + path.getFileName()
-                        + "\"\r\nContent-Type: " + mimeType + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
-                byteArrays.add(Files.readAllBytes(path));
                 byteArrays.add("\r\n".getBytes(StandardCharsets.UTF_8));
             } else {
                 byteArrays.add(("\"" + entry.getKey() + "\"\r\n\r\n" + entry.getValue() + "\r\n")

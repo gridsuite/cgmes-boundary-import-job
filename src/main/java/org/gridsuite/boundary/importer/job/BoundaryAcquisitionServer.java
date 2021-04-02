@@ -61,7 +61,7 @@ public class BoundaryAcquisitionServer implements AutoCloseable {
         FileObject acquisitionDirectory = serverRoot.resolveFile(acquisitionDirPath);
         List<FileObject> childrenFiles = Arrays.stream(acquisitionDirectory.getChildren()).filter(f -> {
             try {
-                // filter on zip files
+                // filter on zip files that matches pattern
                 return f.isFile() && CgmesBoundaryUtils.isValidBoundaryContainerFileName(f.getName().getBaseName());
             } catch (FileSystemException e) {
                 return false;
