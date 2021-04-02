@@ -55,8 +55,6 @@ public class CgmesBoundaryServiceRequester {
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        LOGGER.info("Cgmes boundary server response status: {}", response.statusCode());
-        LOGGER.info("Cgmes boundary server response body: {}", response.body());
         return response.statusCode() == 200;
     }
 
@@ -100,26 +98,6 @@ public class CgmesBoundaryServiceRequester {
 
         // Serializing as byte array
         return HttpRequest.BodyPublishers.ofByteArrays(byteArrays);
-    }
-
-    public boolean existsBoundary(String boundaryId) throws IOException, InterruptedException {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/" + boundaryId + "/exists"))
-                .GET()
-                .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                return Boolean.parseBoolean(response.body());
-            }
-        } catch (IOException e) {
-            LOGGER.error("I/O Error while testing existence of boundary with id {}", boundaryId);
-        } catch (InterruptedException e) {
-            LOGGER.error("Interruption when testing existence of boundary with id {}", boundaryId);
-            Thread.currentThread().interrupt();
-        }
-        return false;
     }
 
     public List<String> getBoundariesIds() throws IOException, InterruptedException {
