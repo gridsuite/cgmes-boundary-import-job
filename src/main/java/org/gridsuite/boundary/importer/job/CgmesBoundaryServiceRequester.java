@@ -17,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.*;
 
@@ -43,7 +44,7 @@ public class CgmesBoundaryServiceRequester {
         data.put("file", boundaryFile);
 
         // Random 256 length string is used as multipart boundary
-        String boundary = new BigInteger(256, new Random()).toString();
+        String boundary = new BigInteger(256, new SecureRandom()).toString();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serviceUrl + API_VERSION + "/boundaries"))
