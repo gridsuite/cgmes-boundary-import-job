@@ -92,7 +92,7 @@ public class CgmesBoundaryServiceRequester {
         return HttpRequest.BodyPublishers.ofByteArrays(byteArrays);
     }
 
-    public List<String> getBoundariesIds() throws IOException, InterruptedException {
+    public List<String> getBoundariesIds() throws InterruptedException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/ids"))

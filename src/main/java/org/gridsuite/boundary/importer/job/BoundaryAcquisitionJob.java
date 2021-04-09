@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,7 @@ public final class BoundaryAcquisitionJob {
                                        CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                        List<String> filesImported,
                                        List<String> filesAlreadyImported,
-                                       List<String> filesImportFailed) throws InterruptedException {
+                                       List<String> filesImportFailed) throws IOException, InterruptedException {
         try (Reader reader = new InputStreamReader(new ByteArrayInputStream(boundaryContent))) {
             // parse full model to get the id
             FullModel fullModel = FullModel.parse(reader);
@@ -61,10 +60,6 @@ public final class BoundaryAcquisitionJob {
             } else {
                 filesAlreadyImported.add(fileName);
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (InterruptedException e) {
-            throw e;
         }
     }
 
@@ -73,12 +68,12 @@ public final class BoundaryAcquisitionJob {
                                                    CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                                    List<String> filesImported,
                                                    List<String> filesAlreadyImported,
-                                                   List<String> filesImportFailed) throws InterruptedException {
+                                                   List<String> filesImportFailed) throws IOException, InterruptedException {
         String fileName;
         try (SecuredZipInputStream zis = new SecuredZipInputStream(new ByteArrayInputStream(acquiredFile.getData()), CgmesBoundaryUtils.MAX_ZIP_ENTRIES_COUNT, CgmesBoundaryUtils.MAX_ZIP_SIZE)) {
             ZipEntry entry = zis.getNextEntry();
             while (entry != null) {
-                if (new File(entry.getName()).getCanonicalPath().contains("..")) {
+                if (new File(entry.getName()).getCanonicalPath().startsWith("..")) {
                     throw new IllegalStateException("Entry is trying to leave the target dir: " + entry.getName());
                 }
 
@@ -97,10 +92,6 @@ public final class BoundaryAcquisitionJob {
 
                 entry = zis.getNextEntry();
             }
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (InterruptedException e) {
-            throw e;
         }
     }
 
