@@ -33,7 +33,8 @@ public class BoundaryAcquisitionServer implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(BoundaryAcquisitionServer.class);
 
     private final StandardFileSystemManager fsManager = new StandardFileSystemManager();
-    private FileSystemOptions fsOptions = new FileSystemOptions();
+    private final FileSystemOptions fsOptions = new FileSystemOptions();
+    private static final int CONNECTION_TIMEOUT = 30000;
 
     private String serverUrl;
 
@@ -45,10 +46,10 @@ public class BoundaryAcquisitionServer implements AutoCloseable {
 
         SftpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(fsOptions, true);
         SftpFileSystemConfigBuilder.getInstance().setPreferredAuthentications(fsOptions, "publickey,password");
-        SftpFileSystemConfigBuilder.getInstance().setConnectTimeoutMillis(fsOptions, 30000);
+        SftpFileSystemConfigBuilder.getInstance().setConnectTimeoutMillis(fsOptions, CONNECTION_TIMEOUT);
 
         FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(fsOptions, true);
-        FtpFileSystemConfigBuilder.getInstance().setConnectTimeout(fsOptions, 30000);
+        FtpFileSystemConfigBuilder.getInstance().setConnectTimeout(fsOptions, CONNECTION_TIMEOUT);
         FtpFileSystemConfigBuilder.getInstance().setPassiveMode(fsOptions, true);
     }
 
@@ -64,6 +65,7 @@ public class BoundaryAcquisitionServer implements AutoCloseable {
                 // filter on zip files that matches pattern
                 return f.isFile() && CgmesBoundaryUtils.isValidBoundaryContainerFileName(f.getName().getBaseName());
             } catch (FileSystemException e) {
+                LOGGER.warn(e.getMessage());
                 return false;
             }
         }).collect(Collectors.toList());

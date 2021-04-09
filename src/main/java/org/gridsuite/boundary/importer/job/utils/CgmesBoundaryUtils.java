@@ -18,6 +18,10 @@ public final class CgmesBoundaryUtils {
     public static final String TPBD_FILE_REGEX = "^(.*?(__ENTSOE_TPBD_).*(.xml))$";
     public static final String EQBD_FILE_REGEX = "^(.*?(__ENTSOE_EQBD_).*(.xml))$";
 
+    private static final String DOT_REGEX = "[.]";
+    private static final String UNDERSCORE_REGEX = "_";
+    private static final int VERSION_LENGTH = 3;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmesBoundaryUtils.class);
 
     private CgmesBoundaryUtils() {
@@ -29,9 +33,6 @@ public final class CgmesBoundaryUtils {
     <effectiveDateTime>: UTC datetime (YYYYMMDDTHHmmZ)
     <fileVersion>: three characters long positive integer number between 000 and 999
      */
-    private static final String DOT_REGEX = "\\.";
-    private static final String UNDERSCORE_REGEX = "\\_";
-
     public static boolean isValidBoundaryContainerFileName(String filename) {
         if (filename.split(DOT_REGEX).length == 2) {
             String base = filename.split(DOT_REGEX)[0];
@@ -52,7 +53,11 @@ public final class CgmesBoundaryUtils {
     private static boolean isValidFileVersion(String version) {
         try {
             int v = Integer.parseInt(version);
-            return version.length() == 3 && v > 0 && v < 1000;
+            if (version.length() != VERSION_LENGTH) {
+                LOGGER.warn("File version length is {} and it should be {}", version.length(), VERSION_LENGTH);
+                return false;
+            }
+            return v > 0 && v < 1000;
         } catch (NumberFormatException e) {
             LOGGER.warn("Invalid file version {}", version);
             return false;
