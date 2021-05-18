@@ -119,8 +119,8 @@ public class BoundaryImportJobTest {
         }
     }
 
-    private void addGetBoundariesIdsExpectation(String json) {
-        mockServer.getClient().when(request().withMethod("GET").withPath("/v1/boundaries/ids"))
+    private void addGetBoundariesInfosExpectation(String json) {
+        mockServer.getClient().when(request().withMethod("GET").withPath("/v1/boundaries/infos"))
             .respond(response().withStatusCode(200)
                 .withContentType(MediaType.JSON_UTF_8)
                 .withBody(json));
@@ -154,7 +154,7 @@ public class BoundaryImportJobTest {
         String[] args = null;
 
         // 1 zip container for boundaries on SFTP server, no boundary already present in cgmes boundary server, 2 boundaries will be imported
-        addGetBoundariesIdsExpectation("[]");
+        addGetBoundariesInfosExpectation("[]");
         addPostBoundaryExpectation(200);
 
         BoundaryAcquisitionJob.main(args);
@@ -163,7 +163,8 @@ public class BoundaryImportJobTest {
 
         // 1 boundary already present in cgmes boundary server, only 1 boundary will be imported
         mockServer.getClient().clear(request());
-        addGetBoundariesIdsExpectation("[\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\"]");
+        addGetBoundariesInfosExpectation("[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"}]");
+
         addPostBoundaryExpectation(200);
 
         BoundaryAcquisitionJob.main(args);
@@ -172,7 +173,7 @@ public class BoundaryImportJobTest {
 
         // all boundaries already present in cgmes boundary server, no boundary will be imported
         mockServer.getClient().clear(request());
-        addGetBoundariesIdsExpectation("[\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\", \"urn:uuid:11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa\"]");
+        addGetBoundariesInfosExpectation("[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"},{\"id\":\"urn:uuid:11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\"filename\":\"20210315T0000Z__ENTSOE_EQBD_002.xml\",\"scenarioTime\":\"2020-02-02T18:35\"}]");
         addPostBoundaryExpectation(200);
 
         BoundaryAcquisitionJob.main(args);

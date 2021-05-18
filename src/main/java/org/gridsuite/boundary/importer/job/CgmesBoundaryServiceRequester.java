@@ -7,6 +7,7 @@
 package org.gridsuite.boundary.importer.job;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -92,10 +94,10 @@ public class CgmesBoundaryServiceRequester {
         return HttpRequest.BodyPublishers.ofByteArrays(byteArrays);
     }
 
-    public List<String> getBoundariesIds() throws InterruptedException {
+    public List<BoundaryInfo> getBoundariesInfos() throws InterruptedException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/ids"))
+                .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/infos"))
                 .GET()
                 .build();
 
@@ -103,17 +105,18 @@ public class CgmesBoundaryServiceRequester {
             if (response.statusCode() == 200) {
                 String json = response.body();
 
-                List<String> result = new ArrayList<>();
+                List<BoundaryInfo> result = new ArrayList<>();
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
-                    result.add(array.getString(i));
+                    JSONObject obj = array.getJSONObject(i);
+                    result.add(new BoundaryInfo(obj.getString("id"), obj.getString("filename"), LocalDateTime.parse(obj.getString("scenarioTime"))));
                 }
                 return result;
             }
         } catch (IOException e) {
-            LOGGER.error("I/O Error while getting all boundary ids");
+            LOGGER.error("I/O Error while getting all boundary infos");
         } catch (InterruptedException e) {
-            LOGGER.error("Interruption while getting all boundary ids");
+            LOGGER.error("Interruption while getting all boundary infos");
             Thread.currentThread().interrupt();
         }
         return Collections.emptyList();
