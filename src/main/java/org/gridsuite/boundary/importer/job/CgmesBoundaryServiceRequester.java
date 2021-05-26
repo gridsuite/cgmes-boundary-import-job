@@ -7,7 +7,6 @@
 package org.gridsuite.boundary.importer.job;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +107,7 @@ public class CgmesBoundaryServiceRequester {
                 List<BoundaryInfo> result = new ArrayList<>();
                 JSONArray array = new JSONArray(json);
                 for (int i = 0; i < array.length(); i++) {
-                    JSONObject obj = array.getJSONObject(i);
+                    var obj = array.getJSONObject(i);
                     result.add(new BoundaryInfo(obj.getString("id"), obj.getString("filename"), LocalDateTime.parse(obj.getString("scenarioTime"))));
                 }
                 return result;

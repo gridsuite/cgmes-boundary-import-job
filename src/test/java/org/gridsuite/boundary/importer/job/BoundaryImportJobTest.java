@@ -25,6 +25,7 @@ import org.mockserver.verify.VerificationTimes;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -179,5 +180,14 @@ public class BoundaryImportJobTest {
         BoundaryAcquisitionJob.main(args);
 
         mockServer.getClient().verify(request().withMethod("POST").withPath("/v1/boundaries"), VerificationTimes.exactly(0));
+    }
+
+    @Test
+    public void boundaryInfoTest() {
+        LocalDateTime date = LocalDateTime.of(2021, 5, 10, 10, 0, 0);
+        BoundaryInfo info = new BoundaryInfo("urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "20210315T0000Z__ENTSOE_TPBD_002.xml", date);
+        assertEquals("urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb", info.getId());
+        assertEquals("20210315T0000Z__ENTSOE_TPBD_002.xml", info.getFilename());
+        assertEquals(date, info.getScenarioTime());
     }
 }
