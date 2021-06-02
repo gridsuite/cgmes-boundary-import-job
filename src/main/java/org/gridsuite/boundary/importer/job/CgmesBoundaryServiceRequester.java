@@ -6,7 +6,10 @@
  */
 package org.gridsuite.boundary.importer.job;
 
-import org.json.JSONArray;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +22,6 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -101,19 +103,17 @@ public class CgmesBoundaryServiceRequester {
                 .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                String json = response.body();
 
-                List<BoundaryInfo> result = new ArrayList<>();
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    var obj = array.getJSONObject(i);
-                    result.add(new BoundaryInfo(obj.getString("id"), obj.getString("filename"), LocalDateTime.parse(obj.getString("scenarioTime"))));
-                }
-                return result;
+            if (response.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                return mapper.readValue(response.body(), new TypeReference<>() { });
+            } else {
+                LOGGER.error(response.toString());
             }
         } catch (IOException e) {
             LOGGER.error("I/O Error while getting all boundary infos");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         } catch (InterruptedException e) {
             LOGGER.error("Interruption while getting all boundary infos");
             Thread.currentThread().interrupt();

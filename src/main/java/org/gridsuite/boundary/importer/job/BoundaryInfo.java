@@ -9,6 +9,7 @@ package org.gridsuite.boundary.importer.job;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @author Franck Lecuyer <franck.lecuyer at rte-france.com>
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class BoundaryInfo {
 
