@@ -6,7 +6,10 @@
  */
 package org.gridsuite.boundary.importer.job;
 
-import org.json.JSONArray;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,28 +95,27 @@ public class CgmesBoundaryServiceRequester {
         return HttpRequest.BodyPublishers.ofByteArrays(byteArrays);
     }
 
-    public List<String> getBoundariesIds() throws InterruptedException {
+    public List<BoundaryInfo> getBoundariesInfos() throws InterruptedException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/ids"))
+                .uri(URI.create(serviceUrl + API_VERSION + "/boundaries/infos"))
                 .GET()
                 .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                String json = response.body();
 
-                List<String> result = new ArrayList<>();
-                JSONArray array = new JSONArray(json);
-                for (int i = 0; i < array.length(); i++) {
-                    result.add(array.getString(i));
-                }
-                return result;
+            if (response.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                return mapper.readValue(response.body(), new TypeReference<>() { });
+            } else {
+                LOGGER.error(response.toString());
             }
         } catch (IOException e) {
-            LOGGER.error("I/O Error while getting all boundary ids");
+            LOGGER.error("I/O Error while getting all boundary infos");
+            LOGGER.error(ExceptionUtils.getStackTrace(e));
         } catch (InterruptedException e) {
-            LOGGER.error("Interruption while getting all boundary ids");
+            LOGGER.error("Interruption while getting all boundary infos");
             Thread.currentThread().interrupt();
         }
         return Collections.emptyList();

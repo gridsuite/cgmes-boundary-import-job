@@ -36,7 +36,7 @@ public final class BoundaryAcquisitionJob {
     }
 
     private static void importBoundary(byte[] boundaryContent,
-                                       List<String> allBoundaryIds,
+                                       List<BoundaryInfo> allBoundaryInfos,
                                        String fileName,
                                        CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                        List<String> filesImported,
@@ -47,7 +47,7 @@ public final class BoundaryAcquisitionJob {
             FullModel fullModel = FullModel.parse(reader);
             String id = fullModel.getId();
 
-            if (!allBoundaryIds.contains(id)) {
+            if (allBoundaryInfos.stream().noneMatch(b -> b.getId().equals(id))) {
                 // import the boundary to the cgmes boundary server
                 LOGGER.info("Importing boundary file '{}'...", fileName);
 
@@ -64,7 +64,7 @@ public final class BoundaryAcquisitionJob {
     }
 
     private static void handleZipBoundaryContainer(TransferableFile acquiredFile,
-                                                   List<String> allBoundaryIds,
+                                                   List<BoundaryInfo> allBoundaryInfos,
                                                    CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester,
                                                    List<String> filesImported,
                                                    List<String> filesAlreadyImported,
@@ -87,7 +87,7 @@ public final class BoundaryAcquisitionJob {
 
                     byte[] boundaryContent = zis.readAllBytes();
 
-                    importBoundary(boundaryContent, allBoundaryIds, fileName, cgmesBoundaryServiceRequester, filesImported, filesAlreadyImported, filesImportFailed);
+                    importBoundary(boundaryContent, allBoundaryInfos, fileName, cgmesBoundaryServiceRequester, filesImported, filesAlreadyImported, filesImportFailed);
                 }
 
                 entry = zis.getNextEntry();
@@ -118,14 +118,14 @@ public final class BoundaryAcquisitionJob {
             List<String> filesImportFailed = new ArrayList<>();
 
             if (!filesToAcquire.isEmpty()) {
-                // Get all available boundary ids from cgmes boundary server
-                List<String> allBoundaryIds = cgmesBoundaryServiceRequester.getBoundariesIds();
+                // Get all available boundary infos from cgmes boundary server
+                List<BoundaryInfo> allBoundaryInfos = cgmesBoundaryServiceRequester.getBoundariesInfos();
 
                 for (Map.Entry<String, String> fileInfo : filesToAcquire.entrySet()) {
                     // get boundary container zip file
                     TransferableFile acquiredFile = boundaryAcquisitionServer.getFile(fileInfo.getKey(), fileInfo.getValue());
 
-                    handleZipBoundaryContainer(acquiredFile, allBoundaryIds, cgmesBoundaryServiceRequester, filesImported, filesAlreadyImported, filesImportFailed);
+                    handleZipBoundaryContainer(acquiredFile, allBoundaryInfos, cgmesBoundaryServiceRequester, filesImported, filesAlreadyImported, filesImportFailed);
                 }
             }
 
