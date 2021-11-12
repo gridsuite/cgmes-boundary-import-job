@@ -9,9 +9,9 @@ package org.gridsuite.boundary.importer.job;
 import com.powsybl.cgmes.model.FullModel;
 import com.powsybl.commons.config.ModuleConfig;
 import com.powsybl.commons.config.PlatformConfig;
+import com.powsybl.ws.commons.SecuredZipInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.gridsuite.boundary.importer.job.utils.CgmesBoundaryUtils;
-import org.gridsuite.boundary.importer.job.utils.SecuredZipInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
