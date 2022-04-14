@@ -56,7 +56,6 @@
         <apache.commons.vfs2.version>2.6.0</apache.commons.vfs2.version>
         <commons.net.version>3.7</commons.net.version>
         <commons-lang3.version>3.9</commons-lang3.version>
-        <jackson-datatype.version>2.13.2</jackson-datatype.version>
     </properties>
 
     <build>
@@ -144,11 +143,6 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.datatype</groupId>
-                <artifactId>jackson-datatype-jsr310</artifactId>
-                <version>${jackson-datatype.version}</version>
-        </dependency>
 
         </dependencies>
     </dependencyManagement>
