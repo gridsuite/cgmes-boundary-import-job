@@ -7,6 +7,7 @@
 package org.gridsuite.boundary.importer.job;
 
 import com.powsybl.cgmes.model.FullModel;
+import com.powsybl.commons.PowsyblException;
 import com.powsybl.commons.config.ModuleConfig;
 import com.powsybl.commons.config.PlatformConfig;
 import com.powsybl.ws.commons.SecuredZipInputStream;
@@ -99,8 +100,8 @@ public final class BoundaryAcquisitionJob {
 
         PlatformConfig platformConfig = PlatformConfig.defaultConfig();
 
-        ModuleConfig moduleConfigAcquisitionServer = platformConfig.getModuleConfig("acquisition-server");
-        ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getModuleConfig("cgmes-boundary-server");
+        ModuleConfig moduleConfigAcquisitionServer = platformConfig.getOptionalModuleConfig("acquisition-server").orElseThrow(() -> new PowsyblException("Module acquisition-server not found !!"));
+        ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getOptionalModuleConfig("cgmes-boundary-server").orElseThrow(() -> new PowsyblException("Module cgmes-boundary-server not found !!"));
 
         final CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester = new CgmesBoundaryServiceRequester(moduleConfigCgmesBoundaryServer.getStringProperty("url"));
 
