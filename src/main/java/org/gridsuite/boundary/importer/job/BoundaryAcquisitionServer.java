@@ -89,6 +89,7 @@ public class BoundaryAcquisitionServer implements AutoCloseable {
         return new TransferableFile(fileName, file.getContent().getByteArray());
     }
 
+    @Override
     public void close() {
         fsManager.close();
     }
