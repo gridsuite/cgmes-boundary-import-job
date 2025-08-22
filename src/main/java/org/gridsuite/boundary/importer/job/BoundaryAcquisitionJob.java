@@ -82,9 +82,9 @@ public final class BoundaryAcquisitionJob {
                 fileName = FilenameUtils.getName(entry.getName());
 
                 // Check if it is a boundary file
-                if (!fileName.equals("") &&
+                if (!fileName.isEmpty() &&
                     (fileName.matches(CgmesBoundaryUtils.EQBD_FILE_REGEX) ||
-                        fileName.matches(CgmesBoundaryUtils.TPBD_FILE_REGEX))) {
+                     fileName.matches(CgmesBoundaryUtils.TPBD_FILE_REGEX))) {
 
                     byte[] boundaryContent = zis.readAllBytes();
 
@@ -97,20 +97,25 @@ public final class BoundaryAcquisitionJob {
     }
 
     public static void main(String... args) {
+        final PlatformConfig platformConfig = PlatformConfig.defaultConfig();
+        final ModuleConfig moduleConfigAcquisitionServer = platformConfig.getOptionalModuleConfig("acquisition-server").orElseThrow(() -> new PowsyblException("Module acquisition-server not found !!"));
+        final ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getOptionalModuleConfig("cgmes-boundary-server").orElseThrow(() -> new PowsyblException("Module cgmes-boundary-server not found !!"));
+        run(
+            moduleConfigCgmesBoundaryServer.getStringProperty("url"),
+            moduleConfigAcquisitionServer.getStringProperty("username"),
+            moduleConfigAcquisitionServer.getStringProperty("password"),
+            moduleConfigAcquisitionServer.getStringProperty("url"),
+            moduleConfigAcquisitionServer.getStringProperty("cgmes-boundary-directory")
+        );
+    }
 
-        PlatformConfig platformConfig = PlatformConfig.defaultConfig();
+    public static void run(String cgmesBoundaryServerUrl, String acquisitionServerUrl, String acquisitionServerUsername, String acquisitionServerPassword,
+                           String boundaryDirectory) {
+        final CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester = new CgmesBoundaryServiceRequester(cgmesBoundaryServerUrl);
 
-        ModuleConfig moduleConfigAcquisitionServer = platformConfig.getOptionalModuleConfig("acquisition-server").orElseThrow(() -> new PowsyblException("Module acquisition-server not found !!"));
-        ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getOptionalModuleConfig("cgmes-boundary-server").orElseThrow(() -> new PowsyblException("Module cgmes-boundary-server not found !!"));
-
-        final CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester = new CgmesBoundaryServiceRequester(moduleConfigCgmesBoundaryServer.getStringProperty("url"));
-
-        try (BoundaryAcquisitionServer boundaryAcquisitionServer = new BoundaryAcquisitionServer(moduleConfigAcquisitionServer.getStringProperty("url"),
-                                                                         moduleConfigAcquisitionServer.getStringProperty("username"),
-                                                                         moduleConfigAcquisitionServer.getStringProperty("password"))) {
+        try (BoundaryAcquisitionServer boundaryAcquisitionServer = new BoundaryAcquisitionServer(acquisitionServerUrl, acquisitionServerUsername, acquisitionServerPassword)) {
             boundaryAcquisitionServer.open();
 
-            String boundaryDirectory = moduleConfigAcquisitionServer.getStringProperty("cgmes-boundary-directory");
             Map<String, String> filesToAcquire = boundaryAcquisitionServer.listFiles(boundaryDirectory);
             LOGGER.info("{} files found on server", filesToAcquire.size());
 
