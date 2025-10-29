@@ -1,0 +1,4 @@
+#We don't want to start a web server
+spring:
+  main:
+    web-application-type: none
