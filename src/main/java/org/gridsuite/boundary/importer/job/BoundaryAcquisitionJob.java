@@ -82,7 +82,7 @@ public final class BoundaryAcquisitionJob {
                 fileName = FilenameUtils.getName(entry.getName());
 
                 // Check if it is a boundary file
-                if (!fileName.equals("") &&
+                if (!"".equals(fileName) &&
                     (fileName.matches(CgmesBoundaryUtils.EQBD_FILE_REGEX) ||
                         fileName.matches(CgmesBoundaryUtils.TPBD_FILE_REGEX))) {
 
@@ -101,7 +101,8 @@ public final class BoundaryAcquisitionJob {
         PlatformConfig platformConfig = PlatformConfig.defaultConfig();
 
         ModuleConfig moduleConfigAcquisitionServer = platformConfig.getOptionalModuleConfig("acquisition-server").orElseThrow(() -> new PowsyblException("Module acquisition-server not found !!"));
-        ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getOptionalModuleConfig("cgmes-boundary-server").orElseThrow(() -> new PowsyblException("Module cgmes-boundary-server not found !!"));
+        ModuleConfig moduleConfigCgmesBoundaryServer = platformConfig.getOptionalModuleConfig("cgmes-boundary-server").orElseThrow(
+                () -> new PowsyblException("Module cgmes-boundary-server not found !!"));
 
         final CgmesBoundaryServiceRequester cgmesBoundaryServiceRequester = new CgmesBoundaryServiceRequester(moduleConfigCgmesBoundaryServer.getStringProperty("url"));
 

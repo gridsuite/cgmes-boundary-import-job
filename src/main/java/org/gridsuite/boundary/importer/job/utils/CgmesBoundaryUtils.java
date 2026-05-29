@@ -37,7 +37,7 @@ public final class CgmesBoundaryUtils {
         if (filename.split(DOT_REGEX).length == 2) {
             String base = filename.split(DOT_REGEX)[0];
             String ext = filename.split(DOT_REGEX)[1];
-            if (ext.equals("zip") && base.split(UNDERSCORE_REGEX).length == 5) {
+            if ("zip".equals(ext) && base.split(UNDERSCORE_REGEX).length == 5) {
                 String[] parts = base.split(UNDERSCORE_REGEX);
                 if (parts[1].isEmpty() &&
                     parts[2].equals("ENTSOE") &&
