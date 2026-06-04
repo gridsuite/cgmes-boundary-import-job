@@ -164,7 +164,8 @@ public class BoundaryImportJobTest {
 
         // 1 boundary already present in cgmes boundary server, only 1 boundary will be imported
         mockServer.getClient().clear(request());
-        addGetBoundariesInfosExpectation(200, "[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"}]");
+        addGetBoundariesInfosExpectation(200,
+                "[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"}]");
 
         addPostBoundaryExpectation(200);
 
@@ -174,7 +175,9 @@ public class BoundaryImportJobTest {
 
         // all boundaries already present in cgmes boundary server, no boundary will be imported
         mockServer.getClient().clear(request());
-        addGetBoundariesInfosExpectation(200, "[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"},{\"id\":\"urn:uuid:11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\"filename\":\"20210315T0000Z__ENTSOE_EQBD_002.xml\",\"scenarioTime\":\"2020-02-02T18:35\"}]");
+        addGetBoundariesInfosExpectation(200,
+                "[{\"id\":\"urn:uuid:22222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb\",\"filename\":\"20210315T0000Z__ENTSOE_TPBD_002.xml\",\"scenarioTime\":\"2020-02-02T00:00\"},"
+                        + "{\"id\":\"urn:uuid:11111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\"filename\":\"20210315T0000Z__ENTSOE_EQBD_002.xml\",\"scenarioTime\":\"2020-02-02T18:35\"}]");
         addPostBoundaryExpectation(200);
 
         BoundaryAcquisitionJob.main(args);
